@@ -14,7 +14,7 @@
 
 ## 🎯 GENEL BAKIŞ
 
-Mahf Firmware CPU Driver, Intel, AMD ve ARM işlemcileri için geliştirilmiş profesyonel bir performans ve güç yönetim sürücüsüdür. Sürücü, CPU frekansını ve voltajını dinamik olarak kontrol ederek sistem performansını optimize eder.
+Mahf Firmware CPU Driver, Intel ve AMD işlemcileri için geliştirilmiş profesyonel bir performans ve güç yönetim sürücüsüdür. Sürücü, CPU frekansını ve voltajını dinamik olarak kontrol ederek sistem performansını optimize eder.
 
 ### Temel Özellikler:
 - **4 Performans Modu**: Power Save, Balanced, Performance, Extreme
@@ -28,18 +28,18 @@ Mahf Firmware CPU Driver, Intel, AMD ve ARM işlemcileri için geliştirilmiş p
 ## 💻 SİSTEM GEREKSİNİMLERİ
 
 ### Minimum Gereksinimler:
-- **İşletim Sistemi**: Windows 10 (22H2+) / Windows 11
-- **Mimari**: x64 veya ARM64
-- **CPU**: Modern çok çekirdekli işlemci
-- **RAM**: 4 GB
+- **İşletim Sistemi**: Windows 10 (21H2+) / Windows 11 (Tüm seriler)
+- **Mimari**: x64
+- **CPU**: Adı İşlemci olsun yeter
+- **RAM**: 500 mb ve üstü (2 gb önerilir en az)
 - **Disk**: 50 MB boş alan
 - **Yetkiler**: Administrator hakları
 
 ### Desteklenen İşlemciler:
 - **Intel**: Core i3/i5/i7/i9 (8th Gen+), Xeon
 - **AMD**: Ryzen 3/5/7/9 (2000 serisi+)
-- **ARM**: Qualcomm Snapdragon, Microsoft SQ
-
+- **ARM**: YOK
+- 
 ---
 
 ## 📦 KURULUM
@@ -59,4 +59,5 @@ Mahf Firmware CPU Driver, Intel, AMD ve ARM işlemcileri için geliştirilmiş p
 2. Yönetici komut istemi açın:
 ```cmd
 cd /d "sürücü_dosyalarının_klasörü"
+
 install.bat
