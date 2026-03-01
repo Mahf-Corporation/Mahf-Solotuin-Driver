@@ -25,3 +25,23 @@ Suggested next steps (I can implement):
 - Add static analysis enforcement in PRs and fail the pipeline on regressions
 
 Tell me which item you'd like me to pick next and I'll proceed.
+
+## Mahf-Lambea4 Mimarisi (v4)
+
+### Katmanlar
+- **Presentation Layer**: WPF kontrol paneli, kullanıcı etkileşimini ve canlı metriği yönetir.
+- **Service Layer**: Sürücü ile güvenli köprü; servis lifecycle, yeniden bağlanma ve komut yönlendirme.
+- **Kernel Layer**: IOCTL tabanlı performans profili, çekirdek telemetrisi ve frekans kontrolü.
+- **Deployment Layer**: Inno Setup + install script ile tek paket kurulum.
+
+### Sözleşmeler
+- Cihaz adı: `\\.\MahfLambea4CPU`
+- Servis adı: `MahfLambea4CPU`
+- Kontrol paneli exe: `Mahf-Lambea4-ControlPanel.exe`
+- Setup exe: `Mahf-Lambea4-Setup_4.0.0.exe`
+
+### Geliştirme prensipleri
+1. Tüm adlandırmalar ürün sürümü ile uyumlu olmalı.
+2. IOCTL ve veri yapıları driver/service/panel arasında tek kaynaktan yönetilmeli.
+3. Kullanıcı mesajları riskli modlar için doğrulama istemeli.
+4. Kurulum scriptleri idempotent olmalı (var olan servisi güvenli temizleyip yeniden kurmalı).

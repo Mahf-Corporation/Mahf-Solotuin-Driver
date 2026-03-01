@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace MahfCPUControlPanel
+namespace MahfLambea4ControlPanel
 {
     public partial class MainWindow : Window
     {
@@ -35,7 +35,7 @@ namespace MahfCPUControlPanel
         private static extern bool CloseHandle(IntPtr hObject);
 
         // Constants
-        private const string DEVICE_NAME = "\\\\.\\MahfCPU";
+        private const string DEVICE_NAME = "\\\\.\\MahfLambea4CPU";
         private const uint GENERIC_READ = 0x80000000;
         private const uint GENERIC_WRITE = 0x40000000;
         private const uint OPEN_EXISTING = 3;
@@ -44,10 +44,10 @@ namespace MahfCPUControlPanel
         private const uint FILE_SHARE_WRITE = 0x00000002;
 
         // IOCTL Codes
-        private const uint IOCTL_MAHF_GET_CPU_INFO = 0x88802000;
-        private const uint IOCTL_MAHF_GET_PERFORMANCE_DATA = 0x88802004;
-        private const uint IOCTL_MAHF_SET_PERFORMANCE_STATE = 0x88802008;
-        private const uint IOCTL_MAHF_RESET_DRIVER = 0x8880200C;
+        private const uint IOCTL_MAHF_LAMBEA4_GET_CPU_INFO = 0x88802000;
+        private const uint IOCTL_MAHF_LAMBEA4_GET_PERFORMANCE_DATA = 0x88802004;
+        private const uint IOCTL_MAHF_LAMBEA4_SET_PERFORMANCE_STATE = 0x88802008;
+        private const uint IOCTL_MAHF_LAMBEA4_RESET_DRIVER = 0x8880200C;
 
         // Performance states
         private enum PerformanceState
@@ -64,20 +64,20 @@ namespace MahfCPUControlPanel
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 13)]
             public string Vendor;
-            
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 49)]
             public string Brand;
-            
+
             public uint Architecture;
             public uint CoreCount;
             public uint ThreadCount;
             public uint BaseFrequency;
             public uint MaxFrequency;
             public uint CurrentFrequency;
-            
+
             [MarshalAs(UnmanagedType.Bool)]
             public bool HyperThreading;
-            
+
             [MarshalAs(UnmanagedType.Bool)]
             public bool TurboBoost;
         }
@@ -109,24 +109,24 @@ namespace MahfCPUControlPanel
         private void InitializeApplication()
         {
             // Set window properties
-            Title = "Mahf Firmware CPU Control Panel v3.0.2";
+            Title = "Mahf-Lambea4 CPU Control Panel v4.0.0";
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            
+
             // Initialize driver connection
             ConnectToDriver();
-            
+
             // Initialize update timer
             updateTimer = new DispatcherTimer();
             updateTimer.Interval = TimeSpan.FromSeconds(1);
             updateTimer.Tick += UpdateTimer_Tick;
-            
+
             // Load initial data
             if (isConnected)
             {
                 LoadCPUInfo();
                 updateTimer.Start();
             }
-            
+
             // Set initial state
             UpdateUI();
         }
@@ -144,7 +144,7 @@ namespace MahfCPUControlPanel
                     OPEN_EXISTING,
                     FILE_ATTRIBUTE_NORMAL,
                     IntPtr.Zero);
-                
+
                 if (driverHandle.ToInt64() == -1)
                 {
                     int error = Marshal.GetLastWin32Error();
@@ -168,27 +168,27 @@ namespace MahfCPUControlPanel
         {
             if (!isConnected || driverHandle == IntPtr.Zero)
                 return;
-            
+
             try
             {
                 int size = Marshal.SizeOf(typeof(CPU_INFO));
                 IntPtr buffer = Marshal.AllocHGlobal(size);
-                
+
                 uint bytesReturned;
                 bool success = DeviceIoControl(
                     driverHandle,
-                    IOCTL_MAHF_GET_CPU_INFO,
+                    IOCTL_MAHF_LAMBEA4_GET_CPU_INFO,
                     IntPtr.Zero,
                     0,
                     buffer,
                     (uint)size,
                     out bytesReturned,
                     IntPtr.Zero);
-                
+
                 if (success && bytesReturned > 0)
                 {
                     cpuInfo = Marshal.PtrToStructure<CPU_INFO>(buffer);
-                    
+
                     // Update UI on main thread
                     Dispatcher.Invoke(() =>
                     {
@@ -196,7 +196,7 @@ namespace MahfCPUControlPanel
                         CpuCoresLabel.Content = $"{cpuInfo.CoreCount} Cores / {cpuInfo.ThreadCount} Threads";
                         BaseFreqLabel.Content = $"Base: {cpuInfo.BaseFrequency} MHz";
                         MaxFreqLabel.Content = $"Max: {cpuInfo.MaxFrequency} MHz";
-                        
+
                         // Set vendor image
                         if (cpuInfo.Vendor.Contains("Intel"))
                             VendorImage.Source = new System.Windows.Media.Imaging.BitmapImage(
@@ -206,7 +206,7 @@ namespace MahfCPUControlPanel
                                 new Uri("pack://application:,,,/Resources/amd.png"));
                     });
                 }
-                
+
                 Marshal.FreeHGlobal(buffer);
             }
             catch (Exception ex)
@@ -219,34 +219,34 @@ namespace MahfCPUControlPanel
         {
             if (!isConnected || driverHandle == IntPtr.Zero)
                 return;
-            
+
             try
             {
                 int size = Marshal.SizeOf(typeof(PERFORMANCE_DATA));
                 IntPtr buffer = Marshal.AllocHGlobal(size);
-                
+
                 uint bytesReturned;
                 bool success = DeviceIoControl(
                     driverHandle,
-                    IOCTL_MAHF_GET_PERFORMANCE_DATA,
+                    IOCTL_MAHF_LAMBEA4_GET_PERFORMANCE_DATA,
                     IntPtr.Zero,
                     0,
                     buffer,
                     (uint)size,
                     out bytesReturned,
                     IntPtr.Zero);
-                
+
                 if (success && bytesReturned > 0)
                 {
                     perfData = Marshal.PtrToStructure<PERFORMANCE_DATA>(buffer);
-                    
+
                     // Update UI on main thread
                     Dispatcher.Invoke(() =>
                     {
                         UpdatePerformanceUI();
                     });
                 }
-                
+
                 Marshal.FreeHGlobal(buffer);
             }
             catch (Exception ex)
@@ -259,27 +259,27 @@ namespace MahfCPUControlPanel
         {
             if (!isConnected || driverHandle == IntPtr.Zero)
                 return;
-            
+
             try
             {
                 int size = Marshal.SizeOf(typeof(PerformanceState));
                 IntPtr buffer = Marshal.AllocHGlobal(size);
-                
+
                 Marshal.StructureToPtr(state, buffer, false);
-                
+
                 uint bytesReturned;
                 bool success = DeviceIoControl(
                     driverHandle,
-                    IOCTL_MAHF_SET_PERFORMANCE_STATE,
+                    IOCTL_MAHF_LAMBEA4_SET_PERFORMANCE_STATE,
                     buffer,
                     (uint)size,
                     IntPtr.Zero,
                     0,
                     out bytesReturned,
                     IntPtr.Zero);
-                
+
                 Marshal.FreeHGlobal(buffer);
-                
+
                 if (success)
                 {
                     string stateName = state switch
@@ -290,7 +290,7 @@ namespace MahfCPUControlPanel
                         PerformanceState.Extreme => "Extreme",
                         _ => "Unknown"
                     };
-                    
+
                     UpdateStatus($"Performance state set to: {stateName}", true);
                 }
                 else
@@ -315,16 +315,16 @@ namespace MahfCPUControlPanel
             // Update labels and progress bars
             CpuUsageLabel.Content = $"{perfData.Usage}%";
             CpuUsageBar.Value = perfData.Usage;
-            
+
             TemperatureLabel.Content = $"{perfData.Temperature}°C";
             TemperatureBar.Value = perfData.Temperature;
-            
+
             PowerLabel.Content = $"{perfData.PowerConsumption}W";
             PowerBar.Value = Math.Min(perfData.PowerConsumption, 150);
-            
+
             FrequencyLabel.Content = $"{perfData.CurrentFrequency} MHz";
             VoltageLabel.Content = $"{perfData.Voltage / 1000.0:F2}V";
-            
+
             // Update state indicator
             switch (perfData.State)
             {
@@ -345,9 +345,9 @@ namespace MahfCPUControlPanel
                     ModeIndicator.Fill = System.Windows.Media.Brushes.Red;
                     break;
             }
-            
+
             // Update window title with CPU usage
-            Title = $"Mahf CPU Control Panel - {perfData.Usage}% CPU - {perfData.Temperature}°C";
+            Title = $"Mahf-Lambea4 CPU Control Panel - {perfData.Usage}% CPU - {perfData.Temperature}°C";
         }
 
         private void UpdateUI()
@@ -356,7 +356,7 @@ namespace MahfCPUControlPanel
             {
                 StatusLabel.Content = "Status: Not Connected";
                 StatusLabel.Foreground = System.Windows.Media.Brushes.Red;
-                
+
                 // Disable controls
                 PowerSaveButton.IsEnabled = false;
                 BalancedButton.IsEnabled = false;
@@ -367,7 +367,7 @@ namespace MahfCPUControlPanel
             {
                 StatusLabel.Content = "Status: Connected";
                 StatusLabel.Foreground = System.Windows.Media.Brushes.Green;
-                
+
                 // Enable controls
                 PowerSaveButton.IsEnabled = true;
                 BalancedButton.IsEnabled = true;
@@ -381,10 +381,10 @@ namespace MahfCPUControlPanel
             Dispatcher.Invoke(() =>
             {
                 StatusMessageLabel.Content = message;
-                StatusMessageLabel.Foreground = isSuccess ? 
-                    System.Windows.Media.Brushes.Green : 
+                StatusMessageLabel.Foreground = isSuccess ?
+                    System.Windows.Media.Brushes.Green :
                     System.Windows.Media.Brushes.Red;
-                
+
                 // Auto-hide success messages after 3 seconds
                 if (isSuccess)
                 {
@@ -423,7 +423,7 @@ namespace MahfCPUControlPanel
                 "Extreme Mode Warning",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
-            
+
             if (result == MessageBoxResult.Yes)
             {
                 SetPerformanceState(PerformanceState.Extreme);
@@ -436,7 +436,7 @@ namespace MahfCPUControlPanel
             {
                 ConnectToDriver();
             }
-            
+
             LoadCPUInfo();
             UpdatePerformanceData();
         }
@@ -451,13 +451,13 @@ namespace MahfCPUControlPanel
         private void AboutButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(
-                "Mahf Firmware CPU Driver\n" +
-                "Version 3.0.2\n\n" +
+                "Mahf-Lambea4 CPU Platform\n" +
+                "Version 4.0.0\n\n" +
                 "Copyright © 2024 Mahf Corporation\n" +
                 "All Rights Reserved.\n\n" +
                 "Universal CPU Performance and Power Management Driver\n" +
                 "Supports: Intel, AMD, ARM architectures",
-                "About Mahf CPU Driver",
+                "About Mahf-Lambea4 CPU Platform",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
         }
@@ -471,13 +471,13 @@ namespace MahfCPUControlPanel
         {
             // Stop timer
             updateTimer?.Stop();
-            
+
             // Close driver handle
             if (driverHandle != IntPtr.Zero && driverHandle.ToInt64() != -1)
             {
                 CloseHandle(driverHandle);
             }
-            
+
             base.OnClosing(e);
         }
     }

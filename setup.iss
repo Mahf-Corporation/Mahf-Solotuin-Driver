@@ -1,11 +1,11 @@
-; Mahf Firmware CPU Driver - Inno Setup Script
+; Mahf-Lambea4 CPU Platform - Inno Setup Script
 ; Copyright (c) 2024 Mahf Corporation
 
-#define MyAppName "Mahf Firmware CPU Driver"
-#define MyAppVersion "3.0.2"
+#define MyAppName "Mahf-Lambea4 CPU Platform"
+#define MyAppVersion "4.0.0"
 #define MyAppPublisher "Mahf Corporation"
 #define MyAppURL "https://www.mahfcorp.com/"
-#define MyAppExeName "MahfControlPanel.exe"
+#define MyAppExeName "Mahf-Lambea4-ControlPanel.exe"
 
 [Setup]
 AppId={{8F9D7A5B-3C2E-4B1F-9A6D-E4C5B7A8D9F0}}
@@ -17,12 +17,12 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 
 DefaultDirName={autopf}\Mahf\CPU Driver
-DefaultGroupName=Mahf CPU Driver
+DefaultGroupName=Mahf-Lambea4 CPU Driver
 AllowNoIcons=yes
 
 LicenseFile=LICENSE.txt
 OutputDir=Output
-OutputBaseFilename=MahfCPUSetup_{#MyAppVersion}
+OutputBaseFilename=Mahf-Lambea4-Setup_{#MyAppVersion}
 
 Compression=lzma
 SolidCompression=yes
@@ -48,7 +48,7 @@ Source: "Driver\mahf_cpu.inf";  DestDir: "{app}\Driver"; Flags: ignoreversion
 Source: "Driver\mahf_cpu.cat";  DestDir: "{app}\Driver"; Flags: ignoreversion
 
 ; === App ===
-Source: "Bin\MahfControlPanel.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Bin\Mahf-Lambea4-ControlPanel.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 ; === Docs ===
 Source: "README.md";  DestDir: "{app}"; Flags: ignoreversion isreadme
@@ -61,37 +61,37 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 
 [Registry]
 ; === Driver Service ===
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU"; ValueType: string; ValueName: "ImagePath"; ValueData: "\SystemRoot\System32\drivers\mahf_core.sys"
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU"; ValueType: dword; ValueName: "Type"; ValueData: 1
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU"; ValueType: dword; ValueName: "Start"; ValueData: 2
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU"; ValueType: dword; ValueName: "ErrorControl"; ValueData: 1
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU"; ValueType: string; ValueName: "ImagePath"; ValueData: "\SystemRoot\System32\drivers\mahf_core.sys"
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU"; ValueType: dword; ValueName: "Type"; ValueData: 1
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU"; ValueType: dword; ValueName: "Start"; ValueData: 2
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU"; ValueType: dword; ValueName: "ErrorControl"; ValueData: 1
 
 ; === Driver Parameters ===
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU\Parameters"; ValueType: dword; ValueName: "PerformanceMode"; ValueData: 1
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU\Parameters"; ValueType: dword; ValueName: "ThermalThreshold"; ValueData: 85
-Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfCPU\Parameters"; ValueType: dword; ValueName: "PowerLimit"; ValueData: 65
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU\Parameters"; ValueType: dword; ValueName: "PerformanceMode"; ValueData: 1
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU\Parameters"; ValueType: dword; ValueName: "ThermalThreshold"; ValueData: 85
+Root: HKLM; Subkey: "SYSTEM\CurrentControlSet\Services\MahfLambea4CPU\Parameters"; ValueType: dword; ValueName: "PowerLimit"; ValueData: 65
 
 ; === App Info ===
-Root: HKLM; Subkey: "SOFTWARE\Mahf\CPU"; Flags: uninsdeletekey
-Root: HKLM; Subkey: "SOFTWARE\Mahf\CPU"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"
-Root: HKLM; Subkey: "SOFTWARE\Mahf\CPU"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
+Root: HKLM; Subkey: "SOFTWARE\Mahf-Lambea4\CPU"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "SOFTWARE\Mahf-Lambea4\CPU"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersion}"
+Root: HKLM; Subkey: "SOFTWARE\Mahf-Lambea4\CPU"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
 
 [Run]
 ; === Install Driver ===
 Filename: "{sys}\pnputil.exe"; \
 Parameters: "/add-driver ""{app}\Driver\mahf_cpu.inf"" /install"; \
-StatusMsg: "Installing Mahf CPU Driver..."; \
+StatusMsg: "Installing Mahf-Lambea4 CPU Driver..."; \
 Flags: runhidden waituntilterminated
 
 ; === Create Service ===
 Filename: "{sys}\sc.exe"; \
-Parameters: "create MahfCPU binPath= ""{sys}\drivers\mahf_core.sys"" start= auto DisplayName= ""Mahf CPU Driver"""; \
+Parameters: "create MahfLambea4CPU binPath= ""{sys}\drivers\mahf_core.sys"" start= auto DisplayName= ""Mahf-Lambea4 CPU Driver"""; \
 Flags: runhidden waituntilterminated
 
 ; === Start Service ===
 Filename: "{sys}\sc.exe"; \
-Parameters: "start MahfCPU"; \
+Parameters: "start MahfLambea4CPU"; \
 Flags: runhidden waituntilterminated
 
 ; === Launch App ===
@@ -100,8 +100,8 @@ Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; \
 Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "{sys}\sc.exe"; Parameters: "stop MahfCPU";   Flags: runhidden waituntilterminated
-Filename: "{sys}\sc.exe"; Parameters: "delete MahfCPU"; Flags: runhidden waituntilterminated
+Filename: "{sys}\sc.exe"; Parameters: "stop MahfLambea4CPU";   Flags: runhidden waituntilterminated
+Filename: "{sys}\sc.exe"; Parameters: "delete MahfLambea4CPU"; Flags: runhidden waituntilterminated
 Filename: "{sys}\pnputil.exe"; Parameters: "/delete-driver mahf_cpu.inf /uninstall /force"; Flags: runhidden waituntilterminated
 
 [Code]

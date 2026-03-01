@@ -1,64 +1,38 @@
-# Mahf Firmware CPU Driver v3.0.2
-## Kurulum ve Kullanım Kılavuzu
+# Mahf-Lambea4 CPU Platform v4.0.0
+## Kurulum, Mimari ve Kullanım Kılavuzu
 
-## 📋 İÇİNDEKİLER
+Mahf-Lambea4; kernel sürücüsü, Windows servisi, kontrol paneli ve installer bileşenlerinden oluşan yeni nesil bir CPU yönetim platformudur.
 
-1. [Genel Bakış](#genel-bakış)
-2. [Sistem Gereksinimleri](#sistem-gereksinimleri)
-3. [Kurulum](#kurulum)
-4. [Kullanım](#kullanım)
-5. [Sorun Giderme](#sorun-giderme)
-6. [Teknik Detaylar](#teknik-detaylar)
+## 🚀 Öne Çıkan Geliştirmeler
+- **Yeni ürün adı**: Mahf-Lambea4
+- **Katmanlı mimari**: Driver Core + Service Orchestrator + Control Panel + Installer
+- **Tek protokol yaklaşımı**: IOCTL, servis adı, cihaz adı ve exe isimleri uyumlu hale getirildi
+- **Dağıtım standardı**: Kurulum/servis/shortcut akışı yeni isimlerle güncellendi
 
----
+## 🧱 Bileşenler
+1. **Kernel Driver (`mahf_core.c/.h`)**
+   - CPU algılama, çekirdek durumu, performans profili uygulama.
+2. **Service (`mahf_service.c`)**
+   - Driver bağlantısı, servis ömrü yönetimi, komut iletimi.
+3. **Control Panel (`mainwindow.xaml.cs`)**
+   - Canlı izleme, profil seçimi, kullanıcı etkileşimi.
+4. **Installer (`setup.iss`, `install.bat`)**
+   - Driver ve uygulama dağıtımı, servis oluşturma, kayıt girdileri.
 
-## 🎯 GENEL BAKIŞ
+## 📦 Yeni Çıktı Dosyaları
+- `Mahf-Lambea4-Setup_4.0.0.exe`
+- `Mahf-Lambea4-ControlPanel.exe`
+- `Mahf-Lambea4-Service.exe`
 
-Mahf Firmware CPU Driver, Intel ve AMD işlemcileri için geliştirilmiş profesyonel bir performans ve güç yönetim sürücüsüdür. Sürücü, CPU frekansını ve voltajını dinamik olarak kontrol ederek sistem performansını optimize eder.
+## 🛠️ Hızlı Kurulum
+1. `Mahf-Lambea4-Setup_4.0.0.exe` çalıştırın (Yönetici).
+2. Kurulum tamamlandıktan sonra sistemi yeniden başlatın.
+3. Başlat menüsünden **Mahf-Lambea4 CPU Control Panel** açın.
 
-### Temel Özellikler:
-- **4 Performans Modu**: Power Save, Balanced, Performance, Extreme
-- **Gerçek Zamanlı İzleme**: CPU kullanımı, sıcaklık, güç tüketimi
-- **Universal Destek**: Intel, AMD mimarileri
-- **Kararlı Çalışma**: Test edilmiş, hatasız yapı
-- **Kullanıcı Dostu**: Modern kontrol paneli arayüzü
+## 🔐 Minimum Gereksinimler
+- Windows 10 21H2+ / Windows 11
+- x64 mimari
+- Administrator yetkisi
 
----
-
-## 💻 SİSTEM GEREKSİNİMLERİ
-
-### Minimum Gereksinimler:
-- **İşletim Sistemi**: Windows 10 (21H2+) / Windows 11 (Tüm seriler)
-- **Mimari**: x64
-- **CPU**: Adı İşlemci olsun yeter
-- **RAM**: 500 mb ve üstü (2 gb önerilir en az)
-- **Disk**: 50 MB boş alan
-- **Yetkiler**: Administrator hakları
-
-### Desteklenen İşlemciler:
-- **Intel**: Core i3/i5/i7/i9 (8th Gen+), Xeon
-- **AMD**: Ryzen 3/5/7/9 (2000 serisi+)
-- **ARM**: YOK
-- 
----
-
-## 📦 KURULUM
-
-### Yöntem 1: Otomatik Kurulum (Önerilen)
-
-1. `Lambea3-Setup_3.0.2.exe` dosyasını indirin
-2. Sağ tıklayıp "Yönetici olarak çalıştırın"
-3. Kurulum sihirbazını takip edin
-4. Kurulum tamamlandığında sistemi yeniden başlatın
-
-### Yöntem 2: Manuel Kurulum
-
-1. Sürücü dosyalarını hazırlayın:
-
-
-2. Yönetici komut istemi açın:
-```cmd
-cd /d "sürücü_dosyalarının_klasörü"
-
-install.bat
-
+## 🧭 Mimari Doküman
+Detaylı sistem tasarımı için `DEVELOPMENT.md` içindeki yeni Mahf-Lambea4 mimari bölümüne bakın.

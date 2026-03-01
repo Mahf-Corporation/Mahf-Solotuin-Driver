@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [4.0.0] - Mahf-Lambea4 Re-Architecture
+
+### Changed
+- Tüm ürün adlandırmaları Mahf-Lambea4 olarak güncellendi.
+- Driver/Service/Installer/Control Panel arasında cihaz-servis-exe isim sözleşmesi birleştirildi.
+- Dağıtım çıktı adları v4.0.0 standardına taşındı.
+
 ## [3.0.2] - 2026-01-06
 ### Added
 - CMake-based **portable core** (`include/` + `src/`) to allow core logic to be tested in user-mode.

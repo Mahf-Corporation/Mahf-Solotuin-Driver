@@ -1,9 +1,9 @@
 /*
- * Mahf Firmware CPU Driver - User Mode Service
+ * Mahf-Lambea4 CPU Platform - User Mode Service
  * Copyright (c) 2024 Mahf Corporation
- * 
+ *
  * Manages driver communication and system integration
- * Version: 3.0.2
+ * Version: 4.0.0
  */
 
 #include <windows.h>
@@ -12,9 +12,9 @@
 #include <strsafe.h>
 
 // Service configuration
-#define SERVICE_NAME  _T("MahfCPUService")
-#define SERVICE_DISPLAY_NAME  _T("Mahf CPU Service")
-#define SERVICE_DESCRIPTION  _T("Manages Mahf Firmware CPU Driver")
+#define SERVICE_NAME  _T("MahfLambea4Service")
+#define SERVICE_DISPLAY_NAME  _T("Mahf-Lambea4 CPU Service")
+#define SERVICE_DESCRIPTION  _T("Manages Mahf-Lambea4 CPU Platform Driver")
 
 // Global variables
 SERVICE_STATUS g_ServiceStatus = {0};
@@ -35,12 +35,12 @@ BOOL SendDriverCommand(DWORD ioControlCode, LPVOID inputBuffer, DWORD inputSize,
 // Service entry point
 int _tmain(int argc, TCHAR *argv[])
 {
-    SERVICE_TABLE_ENTRY ServiceTable[] = 
+    SERVICE_TABLE_ENTRY ServiceTable[] =
     {
         {SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION) ServiceMain},
         {NULL, NULL}
     };
-    
+
     if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
     {
         // If running as console app
@@ -52,7 +52,7 @@ int _tmain(int argc, TCHAR *argv[])
         }
         return GetLastError();
     }
-    
+
     return 0;
 }
 
@@ -60,18 +60,18 @@ int _tmain(int argc, TCHAR *argv[])
 VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
 {
     DWORD Status = E_FAIL;
-    
+
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
-    
+
     // Register service control handler
     g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrlHandler);
-    
+
     if (g_StatusHandle == NULL)
     {
         return;
     }
-    
+
     // Initialize service status
     ZeroMemory(&g_ServiceStatus, sizeof(g_ServiceStatus));
     g_ServiceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
@@ -80,13 +80,13 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
     g_ServiceStatus.dwWin32ExitCode = 0;
     g_ServiceStatus.dwServiceSpecificExitCode = 0;
     g_ServiceStatus.dwCheckPoint = 0;
-    
+
     // Report initial status
     if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
     {
         OutputDebugString(_T("ServiceMain: SetServiceStatus returned error"));
     }
-    
+
     // Create stop event
     g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (g_ServiceStopEvent == NULL)
@@ -96,7 +96,7 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
         SetServiceStatus(g_StatusHandle, &g_ServiceStatus);
         return;
     }
-    
+
     // Initialize driver connection
     if (!InitializeDriverConnection())
     {
@@ -106,38 +106,38 @@ VOID WINAPI ServiceMain(DWORD argc, LPTSTR *argv)
         SetServiceStatus(g_StatusHandle, &g_ServiceStatus);
         return;
     }
-    
+
     // Report running status
     g_ServiceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP;
     g_ServiceStatus.dwCurrentState = SERVICE_RUNNING;
     g_ServiceStatus.dwWin32ExitCode = 0;
     g_ServiceStatus.dwCheckPoint = 0;
-    
+
     if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
     {
         OutputDebugString(_T("ServiceMain: SetServiceStatus returned error"));
     }
-    
+
     // Start worker thread
     HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
-    
+
     // Wait for stop signal
     WaitForSingleObject(g_ServiceStopEvent, INFINITE);
-    
+
     // Wait for worker thread to finish
     WaitForSingleObject(hThread, 5000);
-    
+
     // Cleanup
     CloseHandle(hThread);
     CloseDriverConnection();
     CloseHandle(g_ServiceStopEvent);
-    
+
     // Report stopped status
     g_ServiceStatus.dwControlsAccepted = 0;
     g_ServiceStatus.dwCurrentState = SERVICE_STOPPED;
     g_ServiceStatus.dwWin32ExitCode = 0;
     g_ServiceStatus.dwCheckPoint = 3;
-    
+
     if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
     {
         OutputDebugString(_T("ServiceMain: SetServiceStatus returned error"));
@@ -152,20 +152,20 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
         case SERVICE_CONTROL_STOP:
             if (g_ServiceStatus.dwCurrentState != SERVICE_RUNNING)
                 break;
-            
+
             g_ServiceStatus.dwControlsAccepted = 0;
             g_ServiceStatus.dwCurrentState = SERVICE_STOP_PENDING;
             g_ServiceStatus.dwWin32ExitCode = 0;
             g_ServiceStatus.dwCheckPoint = 4;
-            
+
             if (SetServiceStatus(g_StatusHandle, &g_ServiceStatus) == FALSE)
             {
                 OutputDebugString(_T("ServiceCtrlHandler: SetServiceStatus returned error"));
             }
-            
+
             SetEvent(g_ServiceStopEvent);
             break;
-            
+
         default:
             break;
     }
@@ -175,16 +175,16 @@ VOID WINAPI ServiceCtrlHandler(DWORD CtrlCode)
 DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
 {
     UNREFERENCED_PARAMETER(lpParam);
-    
+
     // Main service loop
     while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
     {
         // Service functionality here
         // Monitor system, communicate with driver, etc.
-        
+
         Sleep(1000); // Check every second
     }
-    
+
     return ERROR_SUCCESS;
 }
 
@@ -193,27 +193,27 @@ BOOL InitializeDriverConnection()
 {
     // Open driver device
     g_DriverHandle = CreateFile(
-        _T("\\\\.\\MahfCPU"),
+        _T("\\\\.\\MahfLambea4CPU"),
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL,
         OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL,
         NULL);
-    
+
     if (g_DriverHandle == INVALID_HANDLE_VALUE)
     {
         DWORD error = GetLastError();
-        
+
         // Log error
         TCHAR errorMsg[256];
-        StringCchPrintf(errorMsg, 256, 
+        StringCchPrintf(errorMsg, 256,
             _T("Failed to open driver device. Error: %d"), error);
         OutputDebugString(errorMsg);
-        
+
         return FALSE;
     }
-    
+
     OutputDebugString(_T("Driver connection initialized successfully"));
     return TRUE;
 }
@@ -230,14 +230,14 @@ VOID CloseDriverConnection()
 }
 
 // Send command to driver
-BOOL SendDriverCommand(DWORD ioControlCode, LPVOID inputBuffer, DWORD inputSize, 
+BOOL SendDriverCommand(DWORD ioControlCode, LPVOID inputBuffer, DWORD inputSize,
                        LPVOID outputBuffer, DWORD outputSize)
 {
     if (g_DriverHandle == INVALID_HANDLE_VALUE)
         return FALSE;
-    
+
     DWORD bytesReturned = 0;
-    
+
     return DeviceIoControl(
         g_DriverHandle,
         ioControlCode,
@@ -256,14 +256,14 @@ BOOL InstallService()
     SC_HANDLE serviceHandle = NULL;
     TCHAR servicePath[MAX_PATH];
     BOOL result = FALSE;
-    
+
     // Get current executable path
     if (GetModuleFileName(NULL, servicePath, MAX_PATH) == 0)
     {
         printf("GetModuleFileName failed. Error: %d\n", GetLastError());
         return FALSE;
     }
-    
+
     // Open Service Control Manager
     scmHandle = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
     if (scmHandle == NULL)
@@ -271,7 +271,7 @@ BOOL InstallService()
         printf("OpenSCManager failed. Error: %d\n", GetLastError());
         return FALSE;
     }
-    
+
     // Create service
     serviceHandle = CreateService(
         scmHandle,
@@ -287,7 +287,7 @@ BOOL InstallService()
         NULL,
         NULL,
         NULL);
-    
+
     if (serviceHandle == NULL)
     {
         DWORD error = GetLastError();
@@ -304,15 +304,15 @@ BOOL InstallService()
     else
     {
         printf("Service installed successfully.\n");
-        
+
         // Set service description
         SERVICE_DESCRIPTION description = {SERVICE_DESCRIPTION};
         ChangeServiceConfig2(serviceHandle, SERVICE_CONFIG_DESCRIPTION, &description);
-        
+
         CloseServiceHandle(serviceHandle);
         result = TRUE;
     }
-    
+
     CloseServiceHandle(scmHandle);
     return result;
 }
@@ -323,7 +323,7 @@ BOOL UninstallService()
     SC_HANDLE scmHandle = NULL;
     SC_HANDLE serviceHandle = NULL;
     BOOL result = FALSE;
-    
+
     // Open Service Control Manager
     scmHandle = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
     if (scmHandle == NULL)
@@ -331,7 +331,7 @@ BOOL UninstallService()
         printf("OpenSCManager failed. Error: %d\n", GetLastError());
         return FALSE;
     }
-    
+
     // Open service
     serviceHandle = OpenService(scmHandle, SERVICE_NAME, DELETE);
     if (serviceHandle == NULL)
@@ -340,7 +340,7 @@ BOOL UninstallService()
         CloseServiceHandle(scmHandle);
         return FALSE;
     }
-    
+
     // Delete service
     if (DeleteService(serviceHandle))
     {
@@ -351,7 +351,7 @@ BOOL UninstallService()
     {
         printf("DeleteService failed. Error: %d\n", GetLastError());
     }
-    
+
     CloseServiceHandle(serviceHandle);
     CloseServiceHandle(scmHandle);
     return result;
